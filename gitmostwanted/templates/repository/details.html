@@ -1,0 +1,68 @@
+<h3 id="repoDetailsModalTitle">
+  {{ entry.full_name }}
+  <a href="{{ entry.html_url }}" target="_blank"><i class="fi-social-github"></i></a>
+</h3>
+
+<div style="margin-bottom: 10px">
+  {% if entry.language %}
+    <span class="label secondary">{{ entry.language }}</span>
+  {% endif %}
+
+  <span class="label secondary" title="Stars">
+    {{ entry.stargazers_count|number_humanize }} <i class="fi-graph-bar"></i>
+  </span>
+
+  <span class="label secondary" title="Forks">
+    {{ entry.forks_count|number_humanize }} <i class="fi-share"></i>
+  </span>
+
+  <span class="label secondary" title="Subscribers">
+    {{ entry.subscribers_count|number_humanize }} <i class="fi-eye"></i>
+  </span>
+</div>
+
+<div id="repoDetailsChart" style="min-height: 200px;">Generating the popularity chart&hellip;</div>
+
+{% if entry.description %}
+  <div class="panel">{{ entry.description }}</div>
+{% endif %}
+
+{% if means %}
+  <script type="text/javascript">
+      if (!google.charts.Line) {
+        google.charts.load('current', {'packages': ['corechart']});
+      }
+
+      google.charts.setOnLoadCallback(function () {
+        var data = google.visualization.arrayToDataTable([
+          ['Date', 'Popularity']
+          {% for mean in means %}
+            , [new Date("{{ mean.created_at }}"),  {{ mean.value }}]
+          {% endfor %}
+        ]);
+
+        setTimeout(function () {
+          var holder = $('#repoDetailsChart');
+          holder.width(holder.parent().width() + 10)
+            .height(~~(holder.parent().height() * 0.6));
+
+          var options = {
+            axisTitlesPosition: 'in',
+            chartArea: {top: 10, height: holder.height() - 55, width: holder.width() - 80},
+            colors: ['#008CBA'],
+            hAxis: {gridlines: {color: '#EEE'}},
+            legend: {position: 'none'},
+            trendlines: {
+              0: {color: '#B9B9B9', degree: 10, showR2: true, tooltip: false, type: 'polynomial'}
+            },
+            vAxis: {gridlines: {color: '#F3F3F3'}}
+          };
+
+          (new google.visualization.ScatterChart(holder.get(0)))
+            .draw(data, options);
+        }, 200);
+      });
+  </script>
+{% endif %}
+
+<a class="close-reveal-modal" aria-label="Close">&#215;</a>

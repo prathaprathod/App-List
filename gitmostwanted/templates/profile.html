@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+
+{% set page_title = account.username %}
+
+{% from "macros/messages.html" import flashed_messages %}
+
+{% block body %}
+  <ul class="breadcrumbs">
+    <li><a href="/">&larr;Trending</a></li>
+    <li><a href="{{ url_for('repo_rating.top') }}">Top&uarr;</a></li>
+    <li class="unavailable"><a href="#">Profile</a></li>
+    <li><a href="{{ url_for('user_attitude.list_unchecked') }}">Attitude&rarr;</a></li>
+  </ul>
+
+  {{  flashed_messages() }}
+
+  <div class="row">
+    <h2>
+      <i class="fi-social-github"></i>
+      <a href="https://github.com/{{ account.username }}" target="_blank">{{ account.username }}</a>
+    </h2>
+    {% if account.id == g.user.id %}
+      <ul class="button-group">
+        <li>
+          <a class="tiny button success"
+            href="{{ url_for('user_oauth.login', next=url_for('user_profile.github_sync'), scope='public_repo') }}">
+            <i class="fi-loop"></i> Synchronise with GitHub
+          </a>
+        </li>
+        <li>
+          <a class="tiny button alert" id="profile-remove"
+            href="{{ url_for('user_profile.remove', im_sure=False) }}">
+            <i class="fi-trash"></i> Delete account
+          </a>
+        </li>
+      </ul>
+    {% endif %}
+  </div>
+
+  <div class="row">
+    <h3 class="subheader"><i class="fi-star"></i> Liked Repositories</h3>
+    {% if repos.count() %}
+      <table>
+        {% for repo in repos %}
+          <tr>
+            <td>
+              <a href="{{ repo.html_url }}" target="_blank">{{ repo.full_name | truncate(28, True) }}</a>
+            </td>
+            <td>{{ repo.language or 'N/A' }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p class="alert-box secondary">No entries found</p>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block js %}
+  <script type="text/javascript">
+    $('#profile-remove').click(function () {
+      if (!confirm('Are you sure you want to delete your profile? (no way to restore it later)')) {
+        return false;
+      }
+      $(this).attr('href', $(this).attr('href').replace('im_sure=False', 'im_sure=True'));
+      return true;
+    });
+  </script>
+{% endblock %}

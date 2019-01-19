@@ -1,0 +1,137 @@
+{% macro repository(repo) -%}
+  <li data-url="{{ repo.html_url }}" class="{{ repo.status }}">
+    <div>
+      <h4>
+        <a href="{{ repo.html_url }}" target="_blank">
+          {% if repo.worth >= config.REPOSITORY_WORTH_SOLID %}
+            <b>{{ repo.full_name }}</b>
+          {% else %}
+            {{ repo.full_name }}
+          {% endif %}
+        </a>
+
+        {% if repo.mature %}
+          <sup class="secondary label" title="Mature enough (Older than 3 months)">m</sup>
+        {% endif %}
+
+        {% if repo.status in ('promising', 'hopeless') %}
+          <sup class="{{ 'success' if repo.status == 'promising' else 'warning' }} label"
+            title="{{ repo.status|capitalize() }}">{{ repo.status[0] }}</sup>
+        {% endif %}
+
+        {% if repo.worth != config.REPOSITORY_WORTH_DEFAULT %}
+          {% if repo.worth > config.REPOSITORY_WORTH_DEFAULT %}
+            <sup class="success label"><i class="fi-arrow-up"></i></sup>
+          {% else %}
+            <sup class="warning label"><i class="fi-arrow-down"></i></sup>
+          {% endif %}
+        {% endif %}
+
+        {% if repo.language %}
+          <small class="right">{{ repo.language }}</small>
+        {% endif %}
+      </h4>
+
+      {% if repo.homepage %}
+        <a href="{{ repo.homepage }}" target="_blank">{{ repo.homepage }}</a>
+      {% endif %}
+
+      {% if repo.description %}
+        <p>{{ repo.description }}</p>
+      {% endif %}
+
+      {{ caller(repo) }}
+    </div>
+  </li>
+{%- endmacro %}
+
+{% macro repository_filter(languages) -%}
+  <a href="#" data-section="search"
+    class="repository-filter button tiny {{ 'success' if request.args.get('term') else 'secondary' }}">
+    <i class="fi-magnifying-glass"></i> Search by name
+  </a>
+  <a href="#" data-section="preset"
+    class="repository-filter button tiny {{'success' if (request.args.get('lang', 'All') != 'All' or 'status' in request.args or 'mature' in request.args) else 'secondary' }}">
+    <i class="fi-filter"></i> Filter options
+  </a>
+
+  <form class="repository-filter">
+
+    {{ caller() }}
+
+    <div class="search hide large-12 columns">
+      <div class="row collapse">
+        <div class="small-8 medium-10 columns">
+          <input type="text" name="term" autofocus="autofocus" maxlength="120"
+            value="{{ request.args.get('term', '') }}" placeholder="Search by name">
+        </div>
+        <div class="small-2 medium-1 columns">
+          <a href="#" class="button postfix secondary"
+            onclick="$('input[name=term]').val('').trigger('change');return false;"><i class="fi-x"></i></a>
+        </div>
+        <div class="small-2 medium-1 columns">
+          <a href="#" class="button postfix success"><i class="fi-magnifying-glass"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="preset hide">
+      <div class="large-12 columns">
+        <div class="row collapse">
+          <div class="small-10 medium-11 columns">
+            <select name="lang">
+              <option>All</option>
+              {% for (lang,) in languages %}
+                <option{{ ' selected="selected"' if request.args.get('lang') == lang }}>{{ lang }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="small-2 medium-1 columns">
+            <a href="#" class="button postfix success"><i class="fi-refresh"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="small-12 columns">
+        <div class="row">
+          <div class="small-2 medium-2 text-right columns">
+            <div class="switch small radius">
+              <input id="statusPromising" type="radio" value="promising" name="status"
+                {{ 'checked' if request.args.get('status') == 'promising' }}>
+              <label for="statusPromising"></label>
+            </div>
+          </div>
+          <div class="small-1 columns">
+            <span class="label success has-tip" data-tooltip aria-haspopup="true"
+              title="Show only Promising repositories">P</span>
+          </div>
+
+          <div class="small-2 medium-2 text-right columns">
+            <div class="switch small radius">
+              <input id="statusHopeless" type="radio" value="hopeless" name="status"
+                {{ 'checked' if request.args.get('status') == 'hopeless' }}>
+              <label for="statusHopeless"></label>
+            </div>
+          </div>
+          <div class="small-1 columns">
+            <span class="label warning has-tip" data-tooltip aria-haspopup="true"
+              title="Show only Hopeless repositories">H</span>
+          </div>
+
+          <div class="small-2 medium-2 text-right columns">
+            <div class="switch small radius">
+              <input id="maturityFlag" type="checkbox" name="mature" value="1"
+                {{ 'checked' if request.args.get('mature') }}>
+              <label for="maturityFlag"></label>
+            </div>
+          </div>
+          <div class="small-1 columns">
+            <span class="label secondary has-tip" data-tooltip aria-haspopup="true"
+              title="Show only mature enough (older than 3 months) repositories">M</span>
+          </div>
+          <div class="small-3 columns">&nbsp;</div>
+        </div>
+      </div>
+    </div>
+  </form>
+{%- endmacro %}

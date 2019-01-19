@@ -1,0 +1,6 @@
+import os
+
+os.environ['GMW_APP_SETTINGS'] = '/path/to/instance.cfg'
+os.environ['GMW_APP_ENV'] = 'production'
+
+from gitmostwanted.web import app as application

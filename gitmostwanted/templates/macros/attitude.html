@@ -1,0 +1,15 @@
+{% macro user_attitude(repo_id, attitude=None) -%}
+  <div class="user-attitude">
+    <a href="{{ url_for('user_attitude.change', repo_id=repo_id, attitude='like') }}"
+      class="button tiny attitude {{ 'success' if attitude == 'like' else 'secondary' }}"
+      data-active-class="success" title="Like it"><i class="fi-like"></i></a>
+
+    <a href="{{ url_for('user_attitude.change', repo_id=repo_id, attitude='neutral') }}"
+      class="button tiny attitude {{ 'info' if attitude == 'neutral' else 'secondary' }}"
+      data-active-class="info" title="Not sure"><i class="fi-check"></i></a>
+
+    <a href="{{ url_for('user_attitude.change', repo_id=repo_id, attitude='dislike') }}"
+      class="button tiny attitude {{ 'alert' if attitude == 'dislike' else 'secondary' }}"
+      data-active-class="alert" title="Useless"><i class="fi-dislike"></i></a>
+  </div>
+{%- endmacro %}
