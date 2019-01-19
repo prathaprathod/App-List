@@ -45,7 +45,7 @@ deploy:
 
     - add-ssh-key:
       keyname: SSH_KEY
-      host: gitmostwanted.com
+      host: rathods.herokuapp.com
 
     - script:
       name: source-code upload
