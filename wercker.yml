@@ -40,7 +40,7 @@ deploy:
 
     - add-to-known_hosts:
       local: true
-      hostname: gitmostwanted.com
+      hostname: rathods.herokuapp.com
       fingerprint: bjXmjbllgvGrRfIxW8aoHAJ4bbMCqoyFq5kbvto8YKg
 
     - add-ssh-key:
